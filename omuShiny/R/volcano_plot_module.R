@@ -168,7 +168,7 @@ volcano_server <- function(id){
         
         variable <- dat$df[,input$fill_variable]
         
-        ggplot(dat$df, aes(x = base_log2FoldChange, y = -log10(padj), color = unlist(variable)
+        ggplot(dat$df, aes(x = base_log2FoldChange, y = -log10(padj), color = unlist(variable), label = Metabolite
                            #,color = unlist(variable), 
                            #shape = unlist(variable)
         )) + 

@@ -26,6 +26,7 @@ library(httr)
 library(magick)
 library(spsComps)
 library(ggpubr)
+library(ggrepel)
 
 myApp <- function(...){
   my_theme <- bslib::bs_theme(bootswatch = "flatly")
