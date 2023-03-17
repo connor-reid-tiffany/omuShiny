@@ -20,6 +20,10 @@ volcano_ui <- function(id){
     actionButton(ns("include_Others"), "Create Plot with All Metabolites",icon = icon("chart-bar"),
                  style="color: #fff; background-color: #0694bf; border-color: #013747"),
     actionButton(ns("rev_x"), "invert foldchange",style="color: #fff; background-color: #0694bf; border-color: #013747"),
+    splitLayout(numericInput(ns("pval"), "pvalue", value = 0.05,width = "75%", min = 0, max = 1),
+    numericInput(ns("l2fc_minus"), "l2fc -", value = -3,width = "70%"),
+    numericInput(ns("l2fc_plus"), "l2fc +", value = 3,width = "70%")),
+    checkboxInput(ns("label_points"), "label",value = FALSE, width = "25%"),
     #could reduce to a function using a dataframe of values for each input and a functional. sliders for plot dimensions etc.
     sliderInput(ns("height"), "Plot Height", min = 100, max = 1500, value = 500),
     sliderInput(ns("width"), "Plot Width", min = 100, max = 1500, value = 500),
@@ -165,9 +169,23 @@ volcano_server <- function(id){
         req(data())
         
         #req(input$exclude_Others | input$include_Others
+        create_point_labels <- function(stats_data, pval = 1, l2fc_minus= 0, l2fc_plus=0){
+          
+          labels <- stats_data[stats_data$padj <=pval,]
+          labelsminus <- labels[labels$base_log2FoldChange < l2fc_minus,]
+          labelsplus <- labels[labels$base_log2FoldChange > l2fc_plus,]
+          labels <- rbind(labelsminus, labelsplus)
+          labels <- labels[labels$KEGG!="NA",]
+          
+          return(labels)
+          
+        }
+        
+        labels <- create_point_labels(stats_data = dat$df, pval = input$pval, 
+                                      l2fc_minus = input$l2fc_minus,l2fc_plus = input$l2fc_plus)
         
         variable <- dat$df[,input$fill_variable]
-        
+        if(input$label_points==FALSE){
         ggplot(dat$df, aes(x = base_log2FoldChange, y = -log10(padj), color = unlist(variable), label = Metabolite
                            #,color = unlist(variable), 
                            #shape = unlist(variable)
@@ -184,7 +202,27 @@ volcano_server <- function(id){
           theme(axis.text = element_text(size = input$font)) +
           theme(axis.title = element_text(size = input$font)) +
           theme(legend.text = element_text(size = input$font), legend.position = "top")
-        
+        }else if (input$label_points==TRUE){
+          ggplot(dat$df, aes(x = base_log2FoldChange, y = -log10(padj), color = unlist(variable), label = Metabolite
+                             #,color = unlist(variable), 
+                             #shape = unlist(variable)
+          )) + 
+            geom_point(size = input$size) +
+            geom_hline(aes(yintercept = -log10(0.05)),linetype = "dashed", color = "grey", size = 1) +
+            #xlim((0-abs(max(dat$df[,"base_log2FoldChange"]))),(0+max(abs(dat$df[,"base_log2FoldChange"]))))+
+            scale_color_manual(values = cols) +
+            coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = TRUE) +
+            #scale_color_manual(values = c(rep("black", length(cols))))+
+            #scale_shape_manual(values = c(rep(21, length(cols))))+
+            geom_label_repel(mapping = aes(label=Metabolite), data = labels,force = 20,
+                             fill = "white", colour = "black", show.legend = FALSE,
+                             min.segment.length = 0.2, size =2.75) +
+            theme(panel.grid = element_blank(), panel.border = element_rect(size = input$border_size_volcano),legend.title = element_blank()) +
+            theme(axis.text = element_text(size = input$font)) +
+            theme(axis.title = element_text(size = input$font)) +
+            theme(legend.text = element_text(size = input$font), legend.position = "top")
+          
+        }
       }
     )
     
