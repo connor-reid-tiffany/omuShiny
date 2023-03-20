@@ -10,30 +10,31 @@ volcano_ui <- function(id){
   tagList(
     actionButton(ns("help"), label = "Help", icon = icon("question-circle", lib = "font-awesome",style="color: #fff; background-color: #0694bf; border-color: #013747")),
     HTML("<br><br><h4>Create a Volcano Plot</h4><br><br>"),
-    selectInput(ns("stats_data"), "Select Data to Plot", choices = NULL, multiple = FALSE),
-    selectInput(ns("fill_variable"), "Select Metabolite Metadata Category", choices = c("Class", "Subclass_1", "Subclass_2", "Subclass_3", "Subclass_4")),
+    splitLayout(selectInput(ns("stats_data"), "Plot Data", choices = NULL, multiple = FALSE, width = "70%"),
+    selectInput(ns("fill_variable"), "Metadata Category", choices = c("Class", "Subclass_1", "Subclass_2", "Subclass_3", "Subclass_4"))),
     #choices are selected server side based off observed event of fill_variable
-    selectizeInput(ns("fill_levels"), "Select Metabolites to Color", choices = NULL,multiple = TRUE),
+    selectizeInput(ns("fill_levels"), "Select Metabolites", choices = NULL,multiple = TRUE),
     #could reduce this to a function, might be useful for other modules
-    actionButton(ns("exclude_Others"), "Create Plot with Selected Metabolites",icon = icon("chart-bar"),
-                 style="color: #fff; background-color: #0694bf; border-color: #013747"),
-    actionButton(ns("include_Others"), "Create Plot with All Metabolites",icon = icon("chart-bar"),
-                 style="color: #fff; background-color: #0694bf; border-color: #013747"),
-    actionButton(ns("rev_x"), "invert foldchange",style="color: #fff; background-color: #0694bf; border-color: #013747"),
-    splitLayout(numericInput(ns("pval"), "pvalue", value = 0.05,width = "75%", min = 0, max = 1),
-    numericInput(ns("l2fc_minus"), "l2fc -", value = -3,width = "70%"),
-    numericInput(ns("l2fc_plus"), "l2fc +", value = 3,width = "70%")),
-    checkboxInput(ns("label_points"), "label",value = FALSE, width = "25%"),
+    splitLayout(cellWidths = c("38%", "31%", "31%"),actionButton(ns("exclude_Others"), "Plot Selected",
+                                 style="color: #fff; background-color: #0694bf; border-color: #013747"),
+                actionButton(ns("include_Others"), "Plot All",
+                                 style="color: #fff; background-color: #0694bf; border-color: #013747", width = "75%"),
+                actionButton(ns("rev_x"), "Invert FC",style="color: #fff; background-color: #0694bf; border-color: #013747", width = "85%")),
+    splitLayout(cellWidths = c("40%", "30%", "30%"),
+                numericInput(ns("pval"), "pvalue", value = 0.05,width = "75%", min = 0, max = 1),
+                numericInput(ns("l2fc_minus"), "l2fc -", value = -3,width = "70%"),
+                numericInput(ns("l2fc_plus"), "l2fc +", value = 3,width = "70%")),
+    checkboxInput(ns("label_points"), "label",value = FALSE),
     #could reduce to a function using a dataframe of values for each input and a functional. sliders for plot dimensions etc.
-    sliderInput(ns("height"), "Plot Height", min = 100, max = 1500, value = 500),
-    sliderInput(ns("width"), "Plot Width", min = 100, max = 1500, value = 500),
-    sliderInput(ns("size"), "Point Size", min = 0.5, max = 10, value = 2),
-    sliderInput(ns("font"), "Font Size", min = 5, max = 25, value = 9),
-    sliderInput(ns("border_size_volcano"), "Border Size", min = 0.5, max = 5, value = 1.5),
+    splitLayout(sliderInput(ns("height"), "Plot Height", min = 100, max = 1500, value = 500, width = "95%"),
+                sliderInput(ns("width"), "Plot Width", min = 100, max = 1500, value = 500, width = "95%")),
+    splitLayout(numericInput(ns("size"), "Point Size", value = 2, width = "70%"),
+                numericInput(ns("font"), "Font Size", value = 9, width = "70%"),
+                numericInput(ns("border_size_volcano"), "Border Size", value = 1.5, width = "70%")),
     radioButtons(ns("extension"), "Save As:",
                  choices = c("png", "pdf", "svg", "pptx"), inline = TRUE),
-    numericInput(ns("figure_height_volc"), label = "Figure Height(cm)", value = 5),
-    numericInput(ns("figure_width_volc"), label = "Figure Width(cm)", value = 5),
+    splitLayout( numericInput(ns("figure_height_volc"), label = "Figure Height(cm)", value = 5, width = "70%"),
+                 numericInput(ns("figure_width_volc"), label = "Figure Width(cm)", value = 5, width = "70%")),
     downloadButton(ns("download_plot"), "Save Plot",style="color: #fff; background-color: #0694bf; border-color: #013747")
     
   )
@@ -203,20 +204,20 @@ volcano_server <- function(id){
           theme(axis.title = element_text(size = input$font)) +
           theme(legend.text = element_text(size = input$font), legend.position = "top")
         }else if (input$label_points==TRUE){
-          ggplot(dat$df, aes(x = base_log2FoldChange, y = -log10(padj), color = unlist(variable), label = Metabolite
+          ggplot(dat$df, aes(x = base_log2FoldChange, y = -log10(padj), colour = unlist(variable), label = Metabolite
                              #,color = unlist(variable), 
                              #shape = unlist(variable)
           )) + 
             geom_point(size = input$size) +
             geom_hline(aes(yintercept = -log10(0.05)),linetype = "dashed", color = "grey", size = 1) +
             #xlim((0-abs(max(dat$df[,"base_log2FoldChange"]))),(0+max(abs(dat$df[,"base_log2FoldChange"]))))+
+            geom_label_repel(data = labels,force = 20, colour = "black",
+                             fill = "white", show.legend = FALSE,
+                             min.segment.length = 0.2, size =3) +
             scale_color_manual(values = cols) +
             coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = TRUE) +
             #scale_color_manual(values = c(rep("black", length(cols))))+
-            #scale_shape_manual(values = c(rep(21, length(cols))))+
-            geom_label_repel(mapping = aes(label=Metabolite), data = labels,force = 20,
-                             fill = "white", colour = "black", show.legend = FALSE,
-                             min.segment.length = 0.2, size =2.75) +
+            #scale_shape_manual(values = c(rep(21, length(cols))))+ +
             theme(panel.grid = element_blank(), panel.border = element_rect(size = input$border_size_volcano),legend.title = element_blank()) +
             theme(axis.text = element_text(size = input$font)) +
             theme(axis.title = element_text(size = input$font)) +
