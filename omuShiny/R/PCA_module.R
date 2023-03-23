@@ -4,15 +4,15 @@ PCA_ui <- function(id){
   tagList(
     HTML("<br><br><h4>Principle Component Analysis</h4><br><br>"),
     selectizeInput(inputId = ns("PCA_variable"), "Pick Variable to Group by", choices = NULL, multiple = FALSE),
-    checkboxInput(inputId = ns("labels"), label = "Toggle Point Labels", value = FALSE),
-    checkboxInput(inputId = ns("ellipses"), label = "Toggle CI Ellipses", value = FALSE),
-    sliderInput(inputId = ns("PCA_size"), label = "Point Size", min = 0.5, max = 5, value = 2.5),
-    sliderInput(inputId = ns("PCA_font"), label = "Font Size", min = 5, max = 50, value = 14),
-    sliderInput(ns("border_size_PCA"), "Border Size", min = 0.5, max = 5, value = 1.5),
+    splitLayout(checkboxInput(inputId = ns("labels"), label = "Toggle Point Labels", value = FALSE),
+                checkboxInput(inputId = ns("ellipses"), label = "Toggle CI Ellipses", value = FALSE)),
+    splitLayout(numericInput(inputId = ns("PCA_size"), label = "Point Size", value = 2.5),
+                numericInput(inputId = ns("PCA_font"), label = "Font Size", value = 14),
+                numericInput(ns("border_size_PCA"), "Border Size", min = 0.5, max = 5, value = 1.5)),
     radioButtons(ns("extension_PCA"), "Save As:",
                  choices = c("png", "pdf", "svg", "pptx"), inline = TRUE),
-    numericInput(ns("figure_height_PCA"), label = "Figure Height(cm)", value = 5),
-    numericInput(ns("figure_width_PCA"), label = "Figure Width(cm)", value = 5),
+    splitLayout(numericInput(ns("figure_height_PCA"), label = "Figure Height(cm)", value = 5),
+                numericInput(ns("figure_width_PCA"), label = "Figure Width(cm)", value = 5)),
     downloadButton(ns("download_plot_PCA"), "Save Plot",style="color: #fff; background-color: #0694bf; border-color: #013747"),
     
     

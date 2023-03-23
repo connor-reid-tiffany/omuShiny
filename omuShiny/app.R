@@ -27,6 +27,7 @@ library(magick)
 library(spsComps)
 library(ggpubr)
 library(ggrepel)
+library(gridExtra)
 
 myApp <- function(...){
   my_theme <- bslib::bs_theme(bootswatch = "flatly")
