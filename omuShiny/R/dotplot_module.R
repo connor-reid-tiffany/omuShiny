@@ -16,18 +16,22 @@ dotplot_ui <- function(id){
     actionButton(ns("create_plot"), "Create Plot",style="color: #fff; background-color: #0694bf; border-color: #013747"),
     #could reduce to a function using a dataframe of values for each input and a functional. sliders for plot dimensions etc.
     HTML("<br><br><h5>Adjust Plot Parameters</h5><br><br>"),
-    sliderInput(ns("height_dotplot"), "Plot Height", min = 100, max = 1500, value = 500),
-    sliderInput(ns("width_dotplot"), "Plot Width", min = 100, max = 1500, value = 500),
-    sliderInput(ns("size_dotplot"), "Point Size", min = 1, max = 10, value = 2, step = 0.25),
-    sliderInput(ns("font_size_dotplot"), "Font Size",min = 5, max = 30, value = 14),
-    sliderInput(ns("border_size_dotplot"), "Border Size", min = 0.5, max = 5, value = 1.5),
+    splitLayout(sliderInput(ns("height_dotplot"), "Plot Height", min = 100, max = 1500, value = 500),
+                sliderInput(ns("width_dotplot"), "Plot Width", min = 100, max = 1500, value = 500)
+    ),
+    splitLayout(numericInput(ns("size_dotplot"), "Point Size", value = 2, step = 0.25),
+                numericInput(ns("font_size_dotplot"), "Font Size", value = 14),
+                numericInput(ns("border_size_dotplot"), "Border Size", value = 1.5)
+    ),
+    colourInput(ns("pvalue_color"), "Choose color for pvalue", value = "black"),
     HTML("<br><br><h5>Download Plot</h5><br><br>"),
     radioButtons(ns("extension_dotplot"), "Save As:",
                  choices = c("pdf", "png","svg", "pptx"), inline = TRUE),
-    numericInput(ns("fig_width_dotplot"), "Base Figure Width", value = 17, min = 1, max = 30),
-    numericInput(ns("fig_height_dotplot"), "Base Figure Height", value = 4, min = 1, max = 30),
+    splitLayout(numericInput(ns("fig_width_dotplot"), "Base Figure Width", value = 5, min = 1, max = 30),
+                numericInput(ns("fig_height_dotplot"), "Base Figure Height", value = 5, min = 1, max = 30)
+    ),
     downloadButton(ns("download_plot_dotplot"), "Save Plot",style="color: #fff; background-color: #0694bf; border-color: #013747"),
-    colourInput(ns("pvalue_color"), "Choose color for pvalue", value = "black")
+    
     
   )
   
