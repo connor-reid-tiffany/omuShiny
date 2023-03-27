@@ -10,7 +10,7 @@ volcano_ui <- function(id){
   tagList(
     actionButton(ns("help"), label = "Help", icon = icon("question-circle", lib = "font-awesome",style="color: #fff; background-color: #0694bf; border-color: #013747")),
     HTML("<br><br><h4>Create a Volcano Plot</h4><br><br>"),
-    splitLayout(selectInput(ns("stats_data"), "Plot Data", choices = NULL, multiple = FALSE, width = "70%"),
+    splitLayout(selectInput(ns("stats_data"), "Plot Data", choices = NULL, multiple = FALSE),
     selectInput(ns("fill_variable"), "Metadata Category", choices = c("Class", "Subclass_1", "Subclass_2", "Subclass_3", "Subclass_4"))),
     #choices are selected server side based off observed event of fill_variable
     selectizeInput(ns("fill_levels"), "Select Metabolites", choices = NULL,multiple = TRUE),
@@ -18,8 +18,8 @@ volcano_ui <- function(id){
     splitLayout(cellWidths = c("38%", "31%", "31%"),actionButton(ns("exclude_Others"), "Plot Selected",
                                  style="color: #fff; background-color: #0694bf; border-color: #013747"),
                 actionButton(ns("include_Others"), "Plot All",
-                                 style="color: #fff; background-color: #0694bf; border-color: #013747", width = "75%"),
-                actionButton(ns("rev_x"), "Invert FC",style="color: #fff; background-color: #0694bf; border-color: #013747", width = "85%")),
+                                 style="color: #fff; background-color: #0694bf; border-color: #013747"),
+                actionButton(ns("rev_x"), "Invert FC",style="color: #fff; background-color: #0694bf; border-color: #013747")),
     splitLayout(cellWidths = c("40%", "30%", "30%"),
                 numericInput(ns("pval"), "pvalue", value = 0.05,width = "75%", min = 0, max = 1),
                 numericInput(ns("l2fc_minus"), "l2fc -", value = -3,width = "70%"),

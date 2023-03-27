@@ -10,11 +10,13 @@ random_forest_ui <- function(id){
     HTML("<br><br><h4>Adjust Plot Parameters</h4><br><br>"),
     selectInput(inputId = ns("rf_meta"),"Select Metabolite Metadata for Color", choices =  c("Class", "Subclass_1", "Subclass_2","Subclass_3", "Subclass_4")),
     numericInput(inputId = ns("rf_n"), "Choose n Metabolites to Plot", value = 10, min = 1, max = 50),
-    checkboxInput(inputId = ns("rf_labels"), label = "Toggle Point Labels", value = FALSE),
-    checkboxInput(inputId = ns("rf_ellipses"), label = "Toggle CI Ellipses", value = FALSE),
-    sliderInput(inputId = ns("rf_point_size"), label = "Point Size", min = 0.5, max = 5, value = 2.5),
-    sliderInput(inputId = ns("rf_font"), label = "Font Size", min = 5, max = 50, value = 14),
-    radioButtons(ns("extension_rf"), "Save As:",
+    splitLayout( checkboxInput(inputId = ns("rf_labels"), label = "Toggle Point Labels", value = FALSE),
+                 checkboxInput(inputId = ns("rf_ellipses"), label = "Toggle CI Ellipses", value = FALSE)
+    ),
+    splitLayout(numericInput(inputId = ns("rf_point_size"), label = "Point Size", value = 2.5),
+                numericInput(inputId = ns("rf_font"), label = "Font Size", value = 14)
+    ),
+   radioButtons(ns("extension_rf"), "Save As:",
                  choices = c("png", "pdf", "svg", "pptx"), inline = TRUE),
     splitLayout( numericInput(ns("figure_height_rf"), label = "Figure Height(cm)", value = 5, width = "70%"),
                  numericInput(ns("figure_width_rf"), label = "Figure Width(cm)", value = 5, width = "70%")),
