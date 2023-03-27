@@ -9,7 +9,7 @@ dotplot_ui <- function(id){
   #help button UI
   tagList(
     actionButton(ns("help_dotplot"), label = "Help", icon = icon("question-circle", lib = "font-awesome"),style="color: #fff; background-color: #0694bf; border-color: #013747"),
-    HTML("<br><br><h4>Create Gene Dotplots</h4><br><br>"),
+    HTML("<br><br><h4>Create Metabolite Dotplots</h4><br><br>"),
     HTML("<br><br><h5>Choose Data to Plot</h5><br><br>"),
     selectInput(ns("stats_data_dotplot"), "Select Data to Plot", choices = NULL, multiple = FALSE),
     selectizeInput(ns("Metabolite"), "Select Metabolite to Plot", choices = NULL,multiple = TRUE),
@@ -218,11 +218,8 @@ dotplot_server <- function(id){
     observeEvent(input$help,{
       showModal(modalDialog(
         title = "Help",
-        HTML("The plot
-        on the left shows log2 transformed, median of ratio normalized read counts for each gene by sample, with bars denoting group means and an asterisk
-        denoting a signficant difference between groups (if applicable) following FDR correction.
-        The plot on the right is a 95% confidence interval of the log2FoldChange between groups, calculated with the following equation:
-        log2FoldChange + qnorm(0.025)*lfcSE and log2FoldChange - qnorm(0.025)*lfcSE, for upper and lower bounds respectively. <br>
+        HTML("The plot shows the log10 metabolite counts per sample. Error bars are standard error of the mean. Requires
+        data from the univariate statistics module. If you used a non-parametric test, use the boxplot module instead.<br>
        <br>
        Perform the following steps to create a plot.<br>
        <br>
