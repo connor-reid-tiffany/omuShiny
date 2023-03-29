@@ -14,7 +14,9 @@ subset_data_ui <- function(id){
               HTML("<br><br><h5>Subset Metabolites by Statistical Significance</h5><br><br>"),
               selectInput(inputId = ns("stats_d"), label = "Select Statistical Data", choices = NULL, multiple = FALSE),
               numericInput(inputId = ns("sig_level"), label = "Select P Value Threshold", value = 0.05),
-              actionButton(inputId = ns("subset_sig"), "Subset by Significance Level",style="color: #fff; background-color: #0694bf; border-color: #013747"))
+              actionButton(inputId = ns("subset_sig"), "Subset by Significance Level",style="color: #fff; background-color: #0694bf; border-color: #013747"),
+              selectizeInput(inputId = ns("metabolite_choice_kg"), "Pick Metabolites", choices = NULL, multiple = TRUE),
+              actionButton(inputId = ns("subset_metabo_kg"), "Subset",style="color: #fff; background-color: #0694bf; border-color: #013747"))
   
   
 }
@@ -28,10 +30,11 @@ pathway_gather_UI <- function(id){
               actionButton(inputId = ns("get_pathways"), "Get Pathways ",style="color: #fff; background-color: #0694bf; border-color: #013747"),
               HTML("<br><br><h5>Select and View Pathway</h5><br><br>"),
               selectInput(inputId = ns("select_pathway"), label = "Select Pathway", choices = NULL, multiple = FALSE),
-              actionButton(inputId = ns("get_images"), "Get Pathway Image",style="color: #fff; background-color: #0694bf; border-color: #013747"),)
+              actionButton(inputId = ns("get_images"), "Get Pathway Image",style="color: #fff; background-color: #0694bf; border-color: #013747"),
+              HTML("<br><br><h5></h5><br><br>"),
+              downloadButton(ns("downloadImage"), "Download image",style="color: #fff; background-color: #0694bf; border-color: #013747")
   
-  
-  
+  )
 }
 
 KEGG_gather_ui <- function(id){
@@ -49,8 +52,9 @@ KEGG_gather_ui <- function(id){
     selectInput(inputId = ns("organism_level"), label = "Select Taxonomic Level", choices = NULL, 
                 multiple = FALSE, selected = NULL),
     selectInput(inputId = ns("organism"), label = "Select Organisms", choices = NULL, multiple = TRUE),
-    actionButton(inputId = ns("subset_genes"), "Subset",style="color: #fff; background-color: #0694bf; border-color: #013747")
-    
+    actionButton(inputId = ns("subset_genes"), "Subset",style="color: #fff; background-color: #0694bf; border-color: #013747"),
+    HTML("<br><br><h5>Download Data</h5><br><br>"),
+    downloadButton(ns("download_kg"), "Download csv",style="color: #fff; background-color: #0694bf; border-color: #013747")
   )
   
   
@@ -67,15 +71,24 @@ KEGG_gather_server <- function(id){
       
       omu_list$kg_data$data <- omu_list$data$metabo
       
-      
-      
-      updateSelectInput(inputId = "metabo_meta_level", choices = unique(omu_list$kg_data$data[,input$metabo_meta]))
-      
-      
-      
       updateSelectInput(inputId = "stats_d", choices = names(omu_list$stats))
       
+      updateSelectizeInput(inputId = "metabolite_choice_kg", choices = omu_list$kg_data$data[!is.na(omu_list$kg_data$data$KEGG),]$Metabolite, selected = character(0))
       
+    })
+    
+    #a reactive to update metabo metadata choices based on selected metadata level
+    metadata_level <- reactive({
+      data <- omu_list$kg_data$data
+      metabolite_types <- data[,input$metabo_meta]
+      return(metabolite_types)
+      
+    })
+    
+    #an observation which dynamically updates the fill_levels input options when the fill_variable input is changed
+    observeEvent(metadata_level(), {
+      choices <- unique(metadata_level())
+      updateSelectInput(inputId = "metabo_meta_level", choices = c(choices))
     })
     
     observeEvent(input$subset_meta, {
@@ -85,6 +98,8 @@ KEGG_gather_server <- function(id){
       kg_data <- kg_data[kg_data[,input$metabo_meta] %in% input$metabo_meta_level,]
       
       omu_list$kg_data$data <- kg_data
+      
+      updateSelectizeInput(inputId = "metabolite_choice_kg", choices = omu_list$kg_data$data$Metabolite, selected = character(0))
       
     })
     
@@ -117,6 +132,8 @@ KEGG_gather_server <- function(id){
       
       omu_list$kg_data$data <- kg_data
       
+      updateSelectizeInput(inputId = "metabolite_choice_kg", choices = omu_list$kg_data$data[!is.na(omu_list$kg_data$data$KEGG),]$Metabolite, selected = character(0))
+      
     })
     
     observeEvent(input$subset_sig, {
@@ -132,12 +149,30 @@ KEGG_gather_server <- function(id){
       kg_data <- kg_data[kg_data$KEGG %in% stats_sig$KEGG,]
       
       omu_list$kg_data$data <- kg_data
+      
+      updateSelectizeInput(inputId = "metabolite_choice_kg", choices = omu_list$kg_data$data[!is.na(omu_list$kg_data$data$KEGG),]$Metabolite, selected = character(0))
+    })
+    
+    observeEvent(input$subset_metabo_kg,{
+      
+      kg_data <- omu_list$kg_data$data
+      
+      kg_data <- kg_data[kg_data$Metabolite %in% input$metabolite_choice_kg,]
+      
+      omu_list$kg_data$data <- kg_data
+      
     })
     
     observeEvent(input$kegg_gather_p,{
       
       
       kg_data <- omu_list$kg_data$data
+      
+      if((nrow(kg_data) > 10)==TRUE){
+        
+        shinyCatch(stop("Kegg gather is limited to 10 metabolites. Select 10 or fewer metabolites and try again."), blocking_level = "error")
+        
+      }
       
       class(kg_data) <- append(class(kg_data), "cpd")
       
@@ -249,6 +284,19 @@ KEGG_gather_server <- function(id){
       
     })
     
+    output$download_kg <- downloadHandler(
+      filename = "kg_data.csv",
+      
+      content = function(file) {
+        
+        l <- reactiveValuesToList(omu_list)
+        l <- c(l$kg_data)
+        write.csv(x = l, file = file)
+        
+        
+      }
+    )
+    
     observeEvent(input$get_pathways,{
       
       #subset data to observation with input$kg_genes
@@ -324,6 +372,14 @@ KEGG_gather_server <- function(id){
       d <- kegg_tables()
       DT::datatable(data = d[["genes"]], options = list(scrollX = TRUE))
     })
+    
+    output$downloadImage <- downloadHandler(
+      filename = "pathway.png",
+      content = function(file) {
+        ## copy the file from the updated image location to the final download location
+        ggsave(file, omu_list$kg_data$path_image, device = "png")
+      }
+    )
     
     
     

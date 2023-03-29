@@ -32,6 +32,12 @@ get_pathways <- function(x){
   
   #pull out NAME and ORGANISM lines
   content_vect <- content[[1]]
+  
+  if((length(grep("PATHWAY", content_vect))==0)==TRUE){
+    
+   shinyCatch(expr = stop("Gene does not have a KEGG pathway module."), blocking_level = "error")
+    
+  }
   NAME_content <- content_vect[grep("NAME", x = content_vect)]
   
   NAME_content <- gsub(pattern = "NAME", replacement = "", x = NAME_content)
