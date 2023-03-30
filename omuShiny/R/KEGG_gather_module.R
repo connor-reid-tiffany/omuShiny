@@ -290,7 +290,7 @@ KEGG_gather_server <- function(id){
       content = function(file) {
         
         l <- reactiveValuesToList(omu_list)
-        l <- c(l$kg_data)
+        l <- c(l$kg_data$genes)
         write.csv(x = l, file = file)
         
         
