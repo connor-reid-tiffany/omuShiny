@@ -58,7 +58,7 @@ ui <- fluidPage(
       tabsetPanel(
         tabPanel("Upload and Transform Data", upload_and_normalization_UI("myModule1")),
         tabPanel("Machine Learning", tabsetPanel(type = "pills",
-                                                 tabPanel("PCA",PCA_ui("myModule1")), tabPanel("Random Forest", random_forest_ui("myModule1")))),
+                                                 tabPanel("PCA",PCA_ui("myModule1"),color_output_pca("myModule1")), tabPanel("Random Forest", random_forest_ui("myModule1")))),
         tabPanel("Univariate Statistics", anova_UI("myModule1")),
         tabPanel("Univariate Plots", tabsetPanel(
           tabPanel("Volcano Plot", volcano_ui("myModule1"),color_output("myModule1")),
