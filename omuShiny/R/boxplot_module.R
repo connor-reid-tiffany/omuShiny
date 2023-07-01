@@ -78,7 +78,7 @@ boxplot_server <- function(id){
       
       
       
-      updateSelectInput(inputId = "Metabolite", choices = unique(data_box()$Metabolite))
+      updateSelectInput(inputId = "Metabolite_boxplot", choices = unique(data_box()$Metabolite))
       
       
     })
@@ -98,13 +98,13 @@ boxplot_server <- function(id){
       })
     })
     
-    dat <- reactiveValues(df = NULL)
+    dat_box <- reactiveValues(df = NULL)
     
     
     observeEvent(input$create_plot_boxplot, {
       
-      dat$df <- data_box()
-      dat$df <- dat$df[dat$df$Metabolite %in% input$Metabolite,]
+      dat_box$df <- data_box()
+      dat_box$df <- dat_box$df[dat_box$df$Metabolite %in% input$Metabolite_boxplot,]
       
       
     })
@@ -118,14 +118,14 @@ boxplot_server <- function(id){
       
       req(data_box())
       
-      df <- dat$df
+      df <- dat_box$df
       
       # print(cols)
       
       cols <- paste0("c(", paste0("input$col_dot", c(unique(data_box()$term)), collapse = ", "), ")")
       cols <- eval(parse(text = cols))
       
-      pval_df <- data.frame(Metabolite = unique(df$Metabolite), y.position=max(df$Abundance) + 10000000, group1 = levels(as.factor(df$term))[1], 
+      pval_df <- data.frame(Metabolite = unique(df$Metabolite), y.position=max(df$Abundance) - 50000, group1 = levels(as.factor(df$term))[1], 
                             group2 = levels(as.factor(df$term))[2])
       
       pval_df$p <- formatC(df$p[match(pval_df$Metabolite, df$Metabolite)], digits = 2, format = "e")
@@ -140,7 +140,9 @@ boxplot_server <- function(id){
               strip.background = element_blank(), 
               axis.title = element_text(size = input$font_size_boxplot), axis.title.x = element_blank())
       
-      plot <- plot + stat_pvalue_manual(pval_df, label = "p", tip.length = 0.5, size = 4.5, bracket.size = 0.9,inherit.aes = FALSE, color = input$pvalue_color_box)
+      plot <- plot + stat_pvalue_manual(pval_df, label = "p", tip.length = 0.02, size = 4.5, 
+                    bracket.size = 0.9,inherit.aes = FALSE, color = input$pvalue_color_box, 
+                    bracket.shorten = 0.5)
       
       
       return(plot)
@@ -148,17 +150,17 @@ boxplot_server <- function(id){
       
     })
     
-    dot_plot_save <- reactive({      
+    box_plot_save <- reactive({      
       
-      req(data())
+      req(data_box())
       
-      df <- dat$df
+      df <- dat_box$df
       cols <- paste0("c(", paste0("input$col_dot", sort(unique(data_box()$term)), collapse = ", "), ")")
       # print(cols)
       cols <- eval(parse(text = cols))
       
       
-      pval_df <- data.frame(Metabolite = unique(df$Metabolite), y.position=max(df$Abundance) + 1000000, group1 = levels(as.factor(df$term))[1], 
+      pval_df <- data.frame(Metabolite = unique(df$Metabolite), y.position=max(df$Abundance) - 50000, group1 = levels(as.factor(df$term))[1], 
                             group2 = levels(as.factor(df$term))[2])
       
       pval_df$p <- formatC(df$p[match(pval_df$Metabolite, df$Metabolite)], digits = 2, format = "e")
@@ -172,7 +174,9 @@ boxplot_server <- function(id){
         theme(panel.grid = element_blank(), panel.background = element_rect(fill = "white"), plot.background = element_rect(fill = "white"), legend.position = "none", panel.border = element_rect(size = input$border_size_dotplot), 
               axis.text = element_text(size = input$font_size_boxplot), strip.text = element_text(size = input$font_size_boxplot), strip.background = element_blank(), 
               axis.title = element_text(size = input$font_size_boxplot), axis.title.x = element_blank()) +
-        stat_pvalue_manual(pval_df, label = "p", tip.length = 0.5, size = 4.5, bracket.size = 0.9, inherit.aes = FALSE, color = input$pvalue_color_box)
+        stat_pvalue_manual(pval_df, label = "p", tip.length = 0.02, size = 4.5, bracket.size = 0.9, 
+                           inherit.aes = FALSE, color = input$pvalue_color_box, 
+                           bracket.shorten = 0.5)
       
       
       return(plot)})

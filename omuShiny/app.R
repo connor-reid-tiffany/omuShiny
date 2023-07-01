@@ -62,7 +62,8 @@ ui <- fluidPage(
         tabPanel("Univariate Statistics", anova_UI("myModule1")),
         tabPanel("Univariate Plots", tabsetPanel(
           tabPanel("Volcano Plot", volcano_ui("myModule1"),color_output("myModule1")),
-          tabPanel("Dotplot", dotplot_ui("myModule1"), color_output_dot("myModule1")), type = "pills"
+          tabPanel("Dotplot", dotplot_ui("myModule1"), color_output_dot("myModule1")),
+          tabPanel("Boxplot", boxplot_ui("myModule1"), color_output_box("myModule1")),type = "pills"
           
         )), 
         tabPanel("KEGG Gather", tabsetPanel(tabPanel("Subset Data", subset_data_ui("myModule1")), 
@@ -75,7 +76,8 @@ ui <- fluidPage(
         tabPanel("PCA Plot", pcaOutput("myModule1")),
         tabPanel("Random Forest Plots", verticalLayout(varimpOutput("myModule1"), rfPCAOutput("myModule1"))),
         tabPanel("Volcano Plot", verticalLayout(plot_output("myModule1"), table_output("myModule1"))),
-        tabPanel("Dotplot", dotplot_output("myModule1")),type = "pills"
+        tabPanel("Dotplot", dotplot_output("myModule1")),
+        tabPanel("Boxplot", boxplot_output("myModule1")),type = "pills"
         
         
         
@@ -112,6 +114,8 @@ server <- function(input, output, session) {
   volcano_server("myModule1")
   
   dotplot_server("myModule1")
+  
+  boxplot_server("myModule1")
   
   KEGG_gather_server("myModule1")
   
