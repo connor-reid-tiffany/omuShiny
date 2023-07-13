@@ -90,7 +90,7 @@ boxplot_server <- function(id){
       
       # New IDs "colX1" so that it partly coincide with input$select...
       lapply(seq_along(lev), function(i) {
-        colourpicker::colourInput(inputId = NS(id,paste0("col_dot", lev[i])),
+        colourpicker::colourInput(inputId = NS(id,paste0("col_box", lev[i])),
                                   label = paste0("Choose Color for ", lev[i]),
                                   value = cbind(cols[i])
         )
@@ -122,17 +122,31 @@ boxplot_server <- function(id){
       
       # print(cols)
       
-      cols <- paste0("c(", paste0("input$col_dot", c(unique(data_box()$term)), collapse = ", "), ")")
+      cols <- paste0("c(", paste0("input$col_box", c(unique(data_box()$term)), collapse = ", "), ")")
       cols <- eval(parse(text = cols))
       
       pval_df <- data.frame(Metabolite = unique(df$Metabolite), y.position=max(df$Abundance) - 50000, group1 = levels(as.factor(df$term))[1], 
                             group2 = levels(as.factor(df$term))[2])
+      df_list <- split(df, f = as.factor(df$Metabolite))
+      
+      max_abundance_list <- lapply(df_list, function(x) max(x$Abundance))
+      
+      max_abundance_df <- as.data.frame(do.call("rbind", max_abundance_list))
+      
+      colnames(max_abundance_df)[1] <- "Abundance" 
+      
+      max_abundance_df$Metabolite <- rownames(max_abundance_df)
+      
+      pval_df$y.position <- max_abundance_df$Abundance[match(pval_df$Metabolite, max_abundance_df$Metabolite)] 
+      
+      pval_df$y.position <- pval_df$y.position - (0.1 * pval_df$y.position)
       
       pval_df$p <- formatC(df$p[match(pval_df$Metabolite, df$Metabolite)], digits = 2, format = "e")
       
       plot <- ggplot(data = df, aes(x = term, y = Abundance, fill = term)) + 
-        facet_wrap(.~ Metabolite) + 
-        geom_boxplot(alpha = 1/3, size = input$size_boxplot) + 
+        facet_wrap(.~ Metabolite, scales = "free") + 
+        geom_boxplot(alpha = 1/3, size = input$size_boxplot) +
+        scale_fill_manual(values = cols) +
         theme(panel.grid = element_blank(), legend.position = "none", 
               panel.border = element_rect(size = input$border_size_boxplot), 
               axis.text = element_text(size = input$font_size_boxplot), 
@@ -140,7 +154,7 @@ boxplot_server <- function(id){
               strip.background = element_blank(), 
               axis.title = element_text(size = input$font_size_boxplot), axis.title.x = element_blank())
       
-      plot <- plot + stat_pvalue_manual(pval_df, label = "p", tip.length = 0.02, size = 4.5, 
+      plot <- plot + stat_pvalue_manual(pval_df, label = "p", tip.length = 0.02, size = 3.5, 
                     bracket.size = 0.9,inherit.aes = FALSE, color = input$pvalue_color_box, 
                     bracket.shorten = 0.5)
       
@@ -163,18 +177,33 @@ boxplot_server <- function(id){
       pval_df <- data.frame(Metabolite = unique(df$Metabolite), y.position=max(df$Abundance) - 50000, group1 = levels(as.factor(df$term))[1], 
                             group2 = levels(as.factor(df$term))[2])
       
+      df_list <- split(df, f = as.factor(df$Metabolite))
+      
+      max_abundance_list <- lapply(df_list, function(x) max(x$Abundance))
+      
+      max_abundance_df <- as.data.frame(do.call("rbind", max_abundance_list))
+      
+      colnames(max_abundance_df)[1] <- "Abundance" 
+      
+      max_abundance_df$Metabolite <- rownames(max_abundance_df)
+      
+      pval_df$y.position <- max_abundance_df$Abundance[match(pval_df$Metabolite, max_abundance_df$Metabolite)] 
+      
+      pval_df$y.position <- pval_df$y.position - (0.1 * pval_df$y.position)
+      
       pval_df$p <- formatC(df$p[match(pval_df$Metabolite, df$Metabolite)], digits = 2, format = "e")
       
       
       
       plot <- ggplot(data = df, aes(x = term, y = Abundance, fill = term)) + 
-        facet_wrap(.~ Metabolite) + 
+        facet_wrap(.~ Metabolite, scales = "free") + 
         geom_boxplot(size = input$size_boxplot, alpha = 1/3) + 
+        scale_fill_manual(values = cols) +
         theme_bw() +
         theme(panel.grid = element_blank(), panel.background = element_rect(fill = "white"), plot.background = element_rect(fill = "white"), legend.position = "none", panel.border = element_rect(size = input$border_size_dotplot), 
               axis.text = element_text(size = input$font_size_boxplot), strip.text = element_text(size = input$font_size_boxplot), strip.background = element_blank(), 
               axis.title = element_text(size = input$font_size_boxplot), axis.title.x = element_blank()) +
-        stat_pvalue_manual(pval_df, label = "p", tip.length = 0.02, size = 4.5, bracket.size = 0.9, 
+        stat_pvalue_manual(pval_df, label = "p", tip.length = 0.02, size = 3.5, bracket.size = 0.9, 
                            inherit.aes = FALSE, color = input$pvalue_color_box, 
                            bracket.shorten = 0.5)
       
