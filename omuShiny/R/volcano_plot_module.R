@@ -32,7 +32,7 @@ volcano_ui <- function(id){
                 numericInput(ns("font"), "Font Size", value = 9, width = "70%"),
                 numericInput(ns("border_size_volcano"), "Border Size", value = 1.5, width = "70%")),
     radioButtons(ns("extension"), "Save As:",
-                 choices = c("png", "pdf", "svg", "pptx"), inline = TRUE),
+                 choices = c("png", "pdf", "svg", "eps","pptx"), inline = TRUE),
     splitLayout( numericInput(ns("figure_height_volc"), label = "Figure Height(cm)", value = 5, width = "70%"),
                  numericInput(ns("figure_width_volc"), label = "Figure Width(cm)", value = 5, width = "70%")),
     downloadButton(ns("download_plot"), "Save Plot",style="color: #fff; background-color: #0694bf; border-color: #013747")
@@ -213,7 +213,7 @@ volcano_server <- function(id){
             #xlim((0-abs(max(dat$df[,"base_log2FoldChange"]))),(0+max(abs(dat$df[,"base_log2FoldChange"]))))+
             geom_label_repel(data = labels,force = 20, colour = "black",
                              fill = "white", show.legend = FALSE,
-                             min.segment.length = 0.2, size =3) +
+                             min.segment.length = 0.2, size =4) +
             scale_color_manual(values = cols) +
             coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = TRUE) +
             #scale_color_manual(values = c(rep("black", length(cols))))+

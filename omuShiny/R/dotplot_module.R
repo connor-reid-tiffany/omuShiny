@@ -26,7 +26,7 @@ dotplot_ui <- function(id){
     colourInput(ns("pvalue_color"), "Choose color for pvalue", value = "black"),
     HTML("<br><br><h5>Download Plot</h5><br><br>"),
     radioButtons(ns("extension_dotplot"), "Save As:",
-                 choices = c("pdf", "png","svg", "pptx"), inline = TRUE),
+                 choices = c("pdf", "png","svg","eps", "pptx"), inline = TRUE),
     splitLayout(numericInput(ns("fig_width_dotplot"), "Base Figure Width", value = 5, min = 1, max = 30),
                 numericInput(ns("fig_height_dotplot"), "Base Figure Height", value = 5, min = 1, max = 30)
     ),
@@ -86,7 +86,7 @@ dotplot_server <- function(id){
       
       # New IDs "colX1" so that it partly coincide with input$select...
       lapply(seq_along(lev), function(i) {
-        colourpicker::colourInput(inputId = NS(id,paste0("col", lev[i])),
+        colourpicker::colourInput(inputId = NS(id,paste0("col_dot", lev[i])),
                                   label = paste0("Choose Color for ", lev[i]),
                                   value = cbind(cols[i])
         )
@@ -105,6 +105,11 @@ dotplot_server <- function(id){
       
     })
     
+    #function to generate breaks
+    every_nth = function(n) {
+      return(function(x) {x[c(TRUE, rep(FALSE, n - 1))]})
+    }
+    
     dot_plot <- reactive({
       
       req(data())
@@ -113,7 +118,7 @@ dotplot_server <- function(id){
       
       # print(cols)
       
-      cols <- paste0("c(", paste0("input$col", c(unique(data()$term)), collapse = ", "), ")")
+      cols <- paste0("c(", paste0("input$col_dot", c(unique(data()$term)), collapse = ", "), ")")
       cols <- eval(parse(text = cols))
       
       pval_df <- data.frame(Metabolite = unique(df$Metabolite), y.position=max(df$Abundance) + 10000000, group1 = levels(as.factor(df$term))[1], 
@@ -133,7 +138,7 @@ dotplot_server <- function(id){
         scale_y_continuous(limits = c(10,1e+08),breaks = c(0.1, 1,10,100,1000,10000,100000,1000000,10000000,100000000), 
                            labels = c(0.1,1, 10,100,1000,10000,100000,1000000,10000000,100000000))
       
-       plot <- plot + stat_pvalue_manual(pval_df, label = "p", tip.length = 0.5, size = 4, bracket.size = 0.9,inherit.aes = FALSE, color = input$pvalue_color)
+       plot <- plot + stat_pvalue_manual(pval_df, label = "p", tip.length = 0.5, size = 4.5, bracket.size = 0.9,inherit.aes = FALSE, color = input$pvalue_color)
       
 
         return(plot)
@@ -146,7 +151,7 @@ dotplot_server <- function(id){
       req(data())
       
       df <- dat$df
-      cols <- paste0("c(", paste0("input$col", sort(unique(data()$term)), collapse = ", "), ")")
+      cols <- paste0("c(", paste0("input$col_dot", sort(unique(data()$term)), collapse = ", "), ")")
       # print(cols)
       cols <- eval(parse(text = cols))
       
@@ -161,7 +166,7 @@ dotplot_server <- function(id){
       plot <- ggplot(data = df, aes(x = term, y = Abundance, fill = term)) + 
         facet_wrap(.~ Metabolite) + 
         geom_jitter(position = position_jitterdodge(), size = input$size_dotplot, shape = 21, color = "black") + 
-        stat_summary(fun = mean, size = 1, color = "black") + 
+        stat_summary(fun = mean, size = 2.5, color = "black",geom = "point") + 
         stat_summary(fun.data = mean_se, geom = "errorbar", size = 0.9, width = 0.3, color = "black")+ 
         coord_trans(y = "log10") +
         theme_bw() +
@@ -170,7 +175,7 @@ dotplot_server <- function(id){
               axis.title = element_text(size = input$font_size_dotplot), axis.title.x = element_blank()) + scale_fill_manual(values = c(cols, "black"))+
         scale_y_continuous(limits = c(10,1e+08),breaks = c(0.1, 1,10,100,1000,10000,100000,1000000,10000000,100000000), 
                            labels = c(0.1,1, 10,100,1000,10000,100000,1000000,10000000,100000000)) +
-        stat_pvalue_manual(pval_df, label = "p", tip.length = 0.5, size = 4, bracket.size = 0.9, inherit.aes = FALSE, color = input$pvalue_color)
+        stat_pvalue_manual(pval_df, label = "p", tip.length = 0.5, size = 4.5, bracket.size = 0.9, inherit.aes = FALSE, color = input$pvalue_color)
       
       
       return(plot)})

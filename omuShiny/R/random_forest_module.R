@@ -17,7 +17,7 @@ random_forest_ui <- function(id){
                 numericInput(inputId = ns("rf_font"), label = "Font Size", value = 14)
     ),
    radioButtons(ns("extension_rf"), "Save As:",
-                 choices = c("png", "pdf", "svg", "pptx"), inline = TRUE),
+                 choices = c("png", "pdf", "svg","eps", "pptx"), inline = TRUE),
     splitLayout( numericInput(ns("figure_height_rf"), label = "Figure Height(cm)", value = 5, width = "70%"),
                  numericInput(ns("figure_width_rf"), label = "Figure Width(cm)", value = 5, width = "70%")),
     downloadButton(ns("download_plot_rf"), "Save Plot",style="color: #fff; background-color: #0694bf; border-color: #013747")
