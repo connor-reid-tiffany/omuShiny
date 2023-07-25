@@ -163,14 +163,14 @@ dotplot_server <- function(id){
       
       
       
-      plot <- ggplot(data = df, aes(x = term, y = Abundance, fill = term)) + 
+      plot <- ggplot() + 
+        theme_bw()+
         facet_wrap(.~ Metabolite) + 
-        geom_jitter(position = position_jitterdodge(), size = input$size_dotplot, shape = 21, color = "black") + 
+        geom_jitter(data = df, aes(x = term, y = Abundance, fill = term),position = position_jitterdodge(), size = input$size_dotplot, shape = 21, color = "black") + 
         stat_summary(fun = mean, size = 2.5, color = "black",geom = "point") + 
         stat_summary(fun.data = mean_se, geom = "errorbar", size = 0.9, width = 0.3, color = "black")+ 
         coord_trans(y = "log10") +
-        theme_bw() +
-        theme(panel.grid = element_blank(), panel.background = element_rect(fill = "white"), plot.background = element_rect(fill = "white"), legend.position = "none", panel.border = element_rect(size = input$border_size_dotplot), 
+        theme(panel.grid = element_blank(), legend.position = "none", panel.border = element_rect(size = input$border_size_dotplot), 
               axis.text = element_text(size = input$font_size_dotplot), strip.text = element_text(size = input$font_size_dotplot), strip.background = element_blank(), 
               axis.title = element_text(size = input$font_size_dotplot), axis.title.x = element_blank()) + scale_fill_manual(values = c(cols, "black"))+
         scale_y_continuous(limits = c(10,1e+08),breaks = c(0.1, 1,10,100,1000,10000,100000,1000000,10000000,100000000), 

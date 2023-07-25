@@ -169,7 +169,7 @@ boxplot_server <- function(id){
       req(data_box())
       
       df <- dat_box$df
-      cols <- paste0("c(", paste0("input$col_dot", sort(unique(data_box()$term)), collapse = ", "), ")")
+      cols <- paste0("c(", paste0("input$col_box", sort(unique(data_box()$term)), collapse = ", "), ")")
       # print(cols)
       cols <- eval(parse(text = cols))
       
@@ -195,12 +195,12 @@ boxplot_server <- function(id){
       
       
       
-      plot <- ggplot(data = df, aes(x = term, y = Abundance, fill = term)) + 
-        facet_wrap(.~ Metabolite, scales = "free") + 
-        geom_boxplot(size = input$size_boxplot, alpha = 1/3) + 
+      plot <- ggplot() + 
+        facet_wrap(.~ Metabolite, scales = "free") +
+        theme_bw()+#panel.background = element_rect(fill = "white"), plot.background = element_rect(fill = "white")) +
+        geom_boxplot(data = df, aes(x = term, y = Abundance, fill = term),size = input$size_boxplot, alpha = 1/3, color = "black") + 
         scale_fill_manual(values = cols) +
-        theme_bw() +
-        theme(panel.grid = element_blank(), panel.background = element_rect(fill = "white"), plot.background = element_rect(fill = "white"), legend.position = "none", panel.border = element_rect(size = input$border_size_dotplot), 
+        theme(panel.grid = element_blank(), legend.position = "none", panel.border = element_rect(size = input$border_size_boxplot), 
               axis.text = element_text(size = input$font_size_boxplot), strip.text = element_text(size = input$font_size_boxplot), strip.background = element_blank(), 
               axis.title = element_text(size = input$font_size_boxplot), axis.title.x = element_blank()) +
         stat_pvalue_manual(pval_df, label = "p", tip.length = 0.02, size = 3.5, bracket.size = 0.9, 
@@ -229,7 +229,7 @@ boxplot_server <- function(id){
     
     output$download_plot_boxplot <- downloadHandler(
       filename = function() {
-        paste("dotplot", input$extension_boxplot, sep = ".")
+        paste("boxplot", input$extension_boxplot, sep = ".")
       },
       
       content = function (file) {
@@ -237,7 +237,7 @@ boxplot_server <- function(id){
           
           doc <-  officer::read_pptx()
           doc <- officer::add_slide(doc, layout =  'Title and Content', master = 'Office Theme')
-          doc <- officer::ph_with(doc, value = box_plot(), location = officer::ph_location_type(type = "body"))
+          doc <- officer::ph_with(doc, value = box_plot_save(), location = officer::ph_location_type(type = "body"))
           print(doc, file)
           
         }else {
