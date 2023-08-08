@@ -1,3 +1,8 @@
+#' get base data function
+#' @param base_metabo untransformed metabolite matrix
+#' @param meta sample data
+#' @param data_stats statistics data
+#' @importFrom reshape2 melt
 get_base_data <- function(base_metabo, meta,data_stats){
   
   if(any(names(data_stats) %in% "contrast")==TRUE){
@@ -33,7 +38,11 @@ get_base_data <- function(base_metabo, meta,data_stats){
 
 
 
-
+#' caluclate base fold changes
+#' @param base_metabo untransformed metabolite matrix
+#' @param meta sample data
+#' @param data_stats statistics data
+#' @importFrom stats aggregate
 calc_base_FCs <- function(base_metabo, meta, data_stats){
   
   if(any(names(data_stats) %in% "contrast")==TRUE){

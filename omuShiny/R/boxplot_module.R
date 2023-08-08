@@ -3,7 +3,11 @@ gg_fill_hue <- function(n) {
   hcl(h = hues, l = 65, c = 100)[1:n]
 }
 
-
+#' UI for box plots
+#' @param id module id
+#' @importFrom shiny NS actionButton HTML selectizeInput selectInput radioButtons downloadButton tagList textInput splitLayout numericInput checkboxInput sliderInput 
+#' @importFrom colourpicker colourInput
+#' @importFrom shinyFeedback useShinyFeedback
 boxplot_ui <- function(id){
   
   ns <- NS(id)
@@ -40,7 +44,16 @@ boxplot_ui <- function(id){
   )
   
 }
-
+#'Server for boxplots
+#' @param id module id
+#' @importFrom shiny NS moduleServer observeEvent reactiveValuesToList reactiveValues updateSelectizeInput req updateSelectInput reactive renderUI downloadHandler showModal modalDialog renderPlot brushedPoints
+#' @importFrom thematic thematic_shiny
+#' @importFrom spsComps shinyCatch
+#' @importFrom colourpicker colourInput
+#' @importFrom ggplot2 ggplot ggsave aes geom_boxplot facet_wrap stat_summary theme theme_bw element_blank element_text element_rect scale_fill_manual
+#' @importFrom ggpubr stat_pvalue_manual
+#' @importFrom officer read_pptx ph_with add_slide ph_location_type
+#' @importFrom DT renderDataTable
 boxplot_server <- function(id){
   
   moduleServer(id, function(input, output, session){
@@ -273,7 +286,9 @@ boxplot_server <- function(id){
     
   })
 }
-
+#'Function for boxplot output
+#' @param id module n
+#' @importFrom shiny NS plotOutput
 boxplot_output <- function(id){
   ns <- NS(id)
   
@@ -282,13 +297,18 @@ boxplot_output <- function(id){
   
   
 }
-
+#'Function for boxplot table
+#' @param id module n
+#' @importFrom shiny NS 
+#' @importFrom DT dataTableOutput
 box_table <- function(id){
   ns <- NS(id)
   DT::dataTableOutput(ns("boxplot_table"))
   
 }
-
+#'Function for boxplot colors
+#' @param id module n
+#' @importFrom shiny NS uiOutput
 color_output_box <- function(id){
   
   ns <- NS(id)

@@ -1,3 +1,11 @@
+#' Histogram function
+#' @param metabo metabolite matrix
+#' @param meta sample data
+#' @param metabolite selected metabolites
+#' @param bins number of bins to plot
+#' @param group independent variable to group by
+#' @importFrom reshape2 melt
+#' @importFrom ggplot2 ggplot geom_histogram aes facet_wrap ylab theme element_blank element_text element_rect
 histogram <- function(metabo, meta, metabolite, bins = 30, group="none"){
   
   #subset to metabolite of choice
@@ -33,6 +41,9 @@ histogram <- function(metabo, meta, metabolite, bins = 30, group="none"){
   
   
 }
+#' function to determine metabolite prevalence across samples
+#' @param metabo metabolite matrix
+#' @param threshold user supplied threshold for subsetting metabolites
 
 metabolite_prevalence <- function(metabo, threshold){
   
@@ -47,6 +58,11 @@ metabolite_prevalence <- function(metabo, threshold){
   
   return(prev_df)
 }
+#' density plot function
+#' @param metabo metabolite matrix
+#' @param meta sample data
+#' @param group independent variable to group by
+#' @importFrom ggplot2 ggplot geom_density aes facet_wrap ylab theme element_blank element_text element_rect
 
 density_plot <- function(metabo, meta, group){
   
@@ -74,7 +90,15 @@ density_plot <- function(metabo, meta, group){
   
   return(plot)
 }
-
+#' kurtosis and skewness function
+#' @param metabo metabolite matrix
+#' @param meta sample data
+#' @param group independent variable to group by
+#' @param metabolite user selected metabolites
+#' @importFrom reshape2 melt
+#' @importFrom stats aggregate p.adjust
+#' @importFrom car leveneTest
+#' @importFrom e1071 kurtosis skewness
 kurtosis_and_skewness <- function(metabo, meta, metabolite, group){
   
   #subset to metabolite of choice

@@ -1,3 +1,6 @@
+#' get pathways function
+#' @param x kegg identifiers
+#' @importFrom httr GET message_for_status
 get_pathways <- function(x){
   
   name <- x
@@ -82,7 +85,11 @@ get_pathways <- function(x){
   
   return(pathways)
 }
-
+#' get pathway image function
+#' @param path_list list of pathways
+#' @param path selected pathway from path_list
+#' @importFrom httr GET message_for_status
+#' @importFrom magick image_read image_annotate image_ggplot
 get_path_image <- function(path_list, path){
   
   pathway <- unlist(path_list[[1]][grep(path, path_list[[1]])])

@@ -1,3 +1,7 @@
+#' UI for univariate statistics
+#' @param id module id
+#' @importFrom shiny NS actionButton HTML selectizeInput radioButtons downloadButton tagList textInput
+#' @importFrom shinyFeedback useShinyFeedback
 anova_UI <- function(id) {
   shinyFeedback::useShinyFeedback()
   ns <- NS(id)
@@ -19,7 +23,12 @@ anova_UI <- function(id) {
     downloadButton(ns("download_anova"), "Download xlsx",style="color: #fff; background-color: #0694bf; border-color: #013747")
   )
 }
-
+#'Server for the univariate statistics module
+#' @param id module id
+#' @importFrom shiny moduleServer observeEvent reactiveValues updateSelectizeInput req updateSelectInput reactive renderUI downloadHandler showModal modalDialog renderPlot
+#' @importFrom spsComps shinyCatch
+#' @importFrom omu omu_anova omu_summary
+#' @importFrom DT renderDataTable datatable
 anova_server <- function(id){
   
   moduleServer(id, function(input, output, session){
@@ -159,6 +168,10 @@ anova_server <- function(id){
   })
 }
 
+#'Function for viewing stats data
+#' @param id module id
+#' @importFrom shiny NS 
+#' @importFrom DT dataTableOutput
 stats_viewer_output <- function(id){
   
   dataTableOutput(NS(id, "stats_data_table"))

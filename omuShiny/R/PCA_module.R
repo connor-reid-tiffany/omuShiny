@@ -1,3 +1,7 @@
+#' UI for PCA
+#' @param id module id
+#' @importFrom shiny NS HTML selectizeInput radioButtons downloadButton tagList splitLayout numericInput checkboxInput 
+#' @importFrom shinyFeedback useShinyFeedback
 PCA_ui <- function(id){
   
   ns <- NS(id)
@@ -22,7 +26,14 @@ PCA_ui <- function(id){
   
   
 }
-
+#'Server for PCA plots
+#' @param id module id
+#' @importFrom shiny NS moduleServer observeEvent reactiveValuesToList reactiveValues updateSelectizeInput req updateSelectInput reactive renderUI downloadHandler showModal modalDialog renderPlot brushedPoints
+#' @importFrom colourpicker colourInput
+#' @importFrom ggplot2 ggsave theme theme_bw element_blank element_text element_rect scale_color_manual scale_fill_manual
+#' @importFrom omu PCA_plot
+#' @importFrom officer read_pptx ph_with add_slide ph_location_type
+#' @importFrom DT renderDataTable
 PCA_server <- function(id){
   
   moduleServer(id, function(input, output, session){
@@ -129,14 +140,18 @@ PCA_server <- function(id){
   
   
 }
-
+#'Function for pca output
+#' @param id module n
+#' @importFrom shiny NS plotOutput
 pcaOutput <- function(id){
   ns <- NS(id)
   
   plotOutput(ns("PCA_plot"))
   
 }
-
+#'Function for pca color output
+#' @param id module n
+#' @importFrom shiny NS uiOutput
 color_output_pca <- function(id){
   
   ns <- NS(id)

@@ -1,3 +1,8 @@
+#' UI for uploading and transforming data
+#' @param id module id
+#' @importFrom shiny NS actionButton HTML numericInput selectInput selectizeInput sliderInput radioButtons downloadButton tagList splitLayout 
+#' @importFrom shinyFeedback useShinyFeedback
+#' @importFrom shinyWidgets numericInputIcon
 upload_and_normalization_UI <- function(id) {
   shinyFeedback::useShinyFeedback()
   ns <- NS(id)
@@ -29,6 +34,13 @@ upload_and_normalization_UI <- function(id) {
   
   
 }
+#'Server for the upload and transform data module
+#' @param id module id
+#' @importFrom shiny moduleServer observeEvent reactiveValues updateSelectizeInput req updateSelectInput reactive renderUI downloadHandler showModal modalDialog renderPlot
+#' @importFrom thematic thematic_shiny
+#' @importFrom spsComps shinyCatch
+#' @importFrom omu assign_hierarchy
+#' @importFrom DT renderDataTable datatable
 
 upload_and_normalization_server <- function(id) {
   
@@ -269,29 +281,44 @@ upload_and_normalization_server <- function(id) {
   
   
 }
+#'Produces histogram 
+#' @param id module id
+#' @importFrom shiny NS plotOutput
 
 histogramOutput <- function(id){
   
   plotOutput(NS(id,"histogram"))
 }
-
+#'Produces density plot
+#' @param id module id
+#' @importFrom shiny NS plotOutput
 densityOutput <- function(id){
   
   plotOutput(NS(id, "density"))
   
 }
+#'Produces kurtosis and skewness table
+#' @param id module id
+#' @importFrom shiny NS 
+#' @importFrom DT dataTableOutput
 k_s_table_output <- function(id){
   
   dataTableOutput(NS(id, "kurtosis_and_skew_table"))
   
 }
-
+#' metabolite data for data viewer tab
+#' @param id module id
+#' @importFrom shiny NS 
+#' @importFrom DT dataTableOutput
 data_viewer_output <- function(id){
   
   dataTableOutput(NS(id, "data_table"))
   
 }
-
+#' sample data for data viewer tab
+#' @param id module id
+#' @importFrom shiny NS 
+#' @importFrom DT dataTableOutput
 sample_viewer_output <- function(id){
   
   dataTableOutput(NS(id, "sample_data"))

@@ -1,3 +1,7 @@
+#' UI for random forest
+#' @param id module id
+#' @importFrom shiny NS HTML actionButton selectInput textInput radioButtons downloadButton tagList splitLayout numericInput checkboxInput 
+#' @importFrom shinyFeedback useShinyFeedback
 random_forest_ui <- function(id){
   
   ns <- NS(id)
@@ -26,7 +30,16 @@ random_forest_ui <- function(id){
   )
   
 }
-
+#'Server for PCA plots
+#' @param id module id
+#' @importFrom shiny NS moduleServer observeEvent reactiveValuesToList reactiveValues updateSelectizeInput req updateSelectInput reactive renderUI downloadHandler showModal modalDialog renderPlot brushedPoints
+#' @importFrom colourpicker colourInput
+#' @importFrom ggplot2 ggsave guides guide_legend theme theme_bw element_blank element_text element_rect scale_color_manual scale_fill_manual scale_x_discrete
+#' @importFrom omu random_forest plot_variable_importance plot_rf_PCA
+#' @importFrom stringr str_trunc
+#' @importFrom officer read_pptx ph_with add_slide ph_location_type
+#' @importFrom DT renderDataTable
+#' @importFrom cowplot plot_grid
 random_forest_server <- function(id){
   
   moduleServer(id, function(input, output, session){
@@ -159,14 +172,18 @@ random_forest_server <- function(id){
     
   }) 
 }
-
+#'Function for variable importance output
+#' @param id module n
+#' @importFrom shiny NS plotOutput
 varimpOutput <- function(id){
   ns <- NS(id)
   
   plotOutput(ns("var_imp_plot"))
   
 }
-
+#'Function for rf pca output
+#' @param id module n
+#' @importFrom shiny NS plotOutput
 rfPCAOutput <- function(id){
   ns <- NS(id)
   

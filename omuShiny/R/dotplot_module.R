@@ -2,7 +2,11 @@ gg_fill_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
   hcl(h = hues, l = 65, c = 100)[1:n]
 }
-
+#' UI for dot plots
+#' @param id module id
+#' @importFrom shiny NS actionButton HTML selectizeInput selectInput radioButtons downloadButton tagList textInput splitLayout numericInput checkboxInput sliderInput 
+#' @importFrom colourpicker colourInput
+#' @importFrom shinyFeedback useShinyFeedback
 dotplot_ui <- function(id){
   
   ns <- NS(id)
@@ -36,7 +40,16 @@ dotplot_ui <- function(id){
   )
   
 }
-
+#'Server for dot plots
+#' @param id module id
+#' @importFrom shiny NS moduleServer observeEvent reactiveValuesToList reactiveValues updateSelectizeInput req updateSelectInput reactive renderUI downloadHandler showModal modalDialog renderPlot brushedPoints
+#' @importFrom thematic thematic_shiny
+#' @importFrom spsComps shinyCatch
+#' @importFrom colourpicker colourInput
+#' @importFrom ggplot2 ggplot ggsave aes geom_jitter facet_wrap stat_summary theme theme_bw element_blank element_text element_rect scale_fill_manual coord_trans scale_y_continuous
+#' @importFrom ggpubr stat_pvalue_manual
+#' @importFrom officer read_pptx ph_with add_slide ph_location_type
+#' @importFrom DT renderDataTable
 dotplot_server <- function(id){
   
   moduleServer(id, function(input, output, session){
@@ -72,10 +85,7 @@ dotplot_server <- function(id){
 
     observeEvent(data(), {
       
-      
-      
       updateSelectInput(inputId = "Metabolite", choices = unique(data()$Metabolite))
-      
       
     })
     
@@ -242,7 +252,9 @@ dotplot_server <- function(id){
     
   })
 }
-
+#'Function for dotplot output
+#' @param id module n
+#' @importFrom shiny NS plotOutput
 dotplot_output <- function(id){
   ns <- NS(id)
   
@@ -251,13 +263,18 @@ dotplot_output <- function(id){
   
   
 }
-
+#'Function for dotplot table
+#' @param id module n
+#' @importFrom shiny NS 
+#' @importFrom DT dataTableOutput
 dot_table <- function(id){
   ns <- NS(id)
   DT::dataTableOutput(ns("dotplot_table"))
   
 }
-
+#'Function for color output
+#' @param id module n
+#' @importFrom shiny NS uiOutput
 color_output_dot <- function(id){
   
   ns <- NS(id)

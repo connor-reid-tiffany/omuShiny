@@ -1,8 +1,17 @@
+#'Function for dynamic color palettes
+#' @param id module n
+#' @importFrom grDevices hcl
+
 gg_fill_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
   hcl(h = hues, l = 65, c = 100)[1:n]
 }
 
+#' UI for volcano plots
+#' @param id module id
+#' @importFrom shiny NS actionButton HTML selectizeInput selectInput sliderInput radioButtons downloadButton tagList textInput splitLayout numericInput checkboxInput
+#' @importFrom colourpicker colourInput
+#' @importFrom shinyFeedback useShinyFeedback
 volcano_ui <- function(id){
   
   ns <- NS(id)
@@ -40,7 +49,15 @@ volcano_ui <- function(id){
   )
   
 }
-
+#'Server for volcano plots
+#' @param id module id
+#' @importFrom shiny NS moduleServer observeEvent reactiveValues reactiveValuesToList updateSelectizeInput req updateSelectInput reactive renderUI downloadHandler showModal modalDialog renderPlot brushedPoints
+#' @importFrom thematic thematic_shiny
+#' @importFrom spsComps shinyCatch
+#' @importFrom colourpicker colourInput
+#' @importFrom ggplot2 ggplot ggsave aes geom_point theme theme_bw element_blank element_text element_rect geom_hline scale_color_manual coord_cartesian 
+#' @importFrom ggrepel geom_label_repel
+#' @importFrom officer read_pptx ph_with add_slide ph_location_type
 volcano_server <- function(id){
   
   moduleServer(id, function(input, output, session){
@@ -312,7 +329,9 @@ volcano_server <- function(id){
     
   })
 }
-
+#'Function for outputting volcano plot
+#' @param id module n
+#' @importFrom shiny NS brushOpts plotOutput
 plot_output <- function(id){
   ns <- NS(id)
   
@@ -324,13 +343,17 @@ plot_output <- function(id){
   
   
 }
-
+#'Function for volcano table output
+#' @param id module n
+#' @importFrom shiny NS tableOutput
 table_output <- function(id){
   ns <- NS(id)
   tableOutput(ns("data"))
   
 }
-
+#'Function for color output
+#' @param id module n
+#' @importFrom shiny NS uiOutput
 color_output <- function(id){
   
   ns <- NS(id)

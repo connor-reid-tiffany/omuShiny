@@ -1,7 +1,11 @@
+#' UI for subset data
+#' @param id module id
+#' @importFrom shiny NS HTML actionButton selectInput tagList numericInput 
+#' @importFrom shinyFeedback useShinyFeedback
 subset_data_ui <- function(id){
   
   ns <- NS(id)
-  tagList(    HTML("<br><br><h4>Select Metabolites</h4><br><br>"),
+  tagList(HTML("<br><br><h4>Select Metabolites</h4><br><br>"),
               actionButton(inputId = ns("start"), "Create Starting Data",style="color: #fff; background-color: #0694bf; border-color: #013747"),
               HTML("<br><br><h5>Subset Metabolites by Metadata</h5><br><br>"),
               selectInput(inputId = ns("metabo_meta"), "Pick Metabolite Metadata Level", 
@@ -18,11 +22,14 @@ subset_data_ui <- function(id){
   
   
 }
-
+#' UI for pathway gather
+#' @param id module id
+#' @importFrom shiny NS HTML actionButton selectInput tagList 
+#' @importFrom shinyFeedback useShinyFeedback
 pathway_gather_UI <- function(id){
   
   ns <- NS(id)
-  tagList(    HTML("<br><br><h4>Get Pathway Image</h4><br><br>"),
+  tagList(HTML("<br><br><h4>Get Pathway Image</h4><br><br>"),
               HTML("<br><br><h5>Select Gene</h5><br><br>"),
               selectInput(inputId = ns("kg_genes"), "Select Gene", choices = NULL, multiple = FALSE),
               actionButton(inputId = ns("get_pathways"), "Get Pathways ",style="color: #fff; background-color: #0694bf; border-color: #013747"),
@@ -33,7 +40,10 @@ pathway_gather_UI <- function(id){
   
   
 }
-
+#' UI for KEGG gather
+#' @param id module id
+#' @importFrom shiny NS HTML actionButton selectInput tagList 
+#' @importFrom shinyFeedback useShinyFeedback
 KEGG_gather_ui <- function(id){
   
   ns <- NS(id)
@@ -57,7 +67,13 @@ KEGG_gather_ui <- function(id){
   
   
 }
-
+#'Server for the upload and transform data module
+#' @param id module id
+#' @importFrom shiny moduleServer observeEvent reactiveValues updateSelectizeInput req updateSelectInput reactive renderUI downloadHandler showModal modalDialog renderPlot
+#' @importFrom thematic thematic_shiny
+#' @importFrom spsComps shinyCatch
+#' @importFrom omu KEGG_gather assign_hierarchy 
+#' @importFrom DT renderDataTable datatable
 KEGG_gather_server <- function(id){
   
   moduleServer(id, function(input, output, session){
@@ -331,19 +347,27 @@ KEGG_gather_server <- function(id){
   
   
 }
-
+#'Function for kg data table
+#' @param id module n
+#' @importFrom shiny NS 
+#' @importFrom DT dataTableOutput
 KG_viewer_output <- function(id){
   
   dataTableOutput(NS(id, "kg_data_table"))
   
 }
-
+#'Function for genes table
+#' @param id module n
+#' @importFrom shiny NS 
+#' @importFrom DT dataTableOutput
 genes_viewer_output <- function(id){
   
   dataTableOutput(NS(id, "kg_genes_table"))
   
 }
-
+#'Function for synthetic pathway image
+#' @param id module n
+#' @importFrom shiny NS plotOutput
 pathway_image_output <- function(id){
   
   plotOutput(NS(id, "path_image"))
