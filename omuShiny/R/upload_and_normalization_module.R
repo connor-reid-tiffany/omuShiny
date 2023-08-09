@@ -8,7 +8,7 @@ upload_and_normalization_UI <- function(id) {
   ns <- NS(id)
   tagList(
     actionButton(inputId = ns("help_norm"), label = "Help", icon = icon("question-circle", lib = "font-awesome"),style="color: #fff; background-color: #0694bf; border-color: #013747"),
-    HTML("<br><br><h4>Upload Data and Create Omu Object</h4><br><br>"),
+    HTML("<br><br><h4>Upload Data</h4><br><br>"),
     splitLayout(fileInput(inputId = ns("upload_metabo"), "Metabolomics Data", accept = c(".csv")),
                     fileInput(inputId = ns("upload_meta"), "Sample Data", accept = c(".csv"))),
     actionButton(inputId = ns("make_list"), "Create Omu Object",style="color: #fff; background-color: #0694bf; border-color: #013747"),

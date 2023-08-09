@@ -19,8 +19,8 @@ volcano_ui <- function(id){
   tagList(
     actionButton(ns("help"), label = "Help", icon = icon("question-circle", lib = "font-awesome",style="color: #fff; background-color: #0694bf; border-color: #013747")),
     HTML("<br><br><h4>Create a Volcano Plot</h4><br><br>"),
-    splitLayout(selectInput(ns("stats_data"), "Plot Data", choices = NULL, multiple = FALSE),
-    selectInput(ns("fill_variable"), "Metadata Category", choices = c("Class", "Subclass_1", "Subclass_2", "Subclass_3", "Subclass_4"))),
+    selectInput(ns("stats_data"), "Plot Data", choices = NULL, multiple = FALSE),
+    selectInput(ns("fill_variable"), "Metadata Category", choices = c("Class", "Subclass_1", "Subclass_2", "Subclass_3", "Subclass_4")),
     #choices are selected server side based off observed event of fill_variable
     selectizeInput(ns("fill_levels"), "Select Metabolites", choices = NULL,multiple = TRUE),
     #could reduce this to a function, might be useful for other modules
