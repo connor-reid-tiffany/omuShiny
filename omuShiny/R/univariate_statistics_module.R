@@ -29,6 +29,7 @@ anova_UI <- function(id) {
 #' @importFrom spsComps shinyCatch
 #' @importFrom omu omu_anova omu_summary
 #' @importFrom DT renderDataTable datatable
+#' @importFrom openxlsx write.xlsx
 anova_server <- function(id){
   
   moduleServer(id, function(input, output, session){

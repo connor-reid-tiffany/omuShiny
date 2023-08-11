@@ -24,7 +24,7 @@ subset_data_ui <- function(id){
 }
 #' UI for pathway gather
 #' @param id module id
-#' @importFrom shiny NS HTML actionButton selectInput tagList 
+#' @importFrom shiny NS HTML actionButton selectInput tagList downloadButton radioButtons
 #' @importFrom shinyFeedback useShinyFeedback
 pathway_gather_UI <- function(id){
   
@@ -35,14 +35,17 @@ pathway_gather_UI <- function(id){
               actionButton(inputId = ns("get_pathways"), "Get Pathways ",style="color: #fff; background-color: #0694bf; border-color: #013747"),
               HTML("<br><br><h5>Select and View Pathway</h5><br><br>"),
               selectInput(inputId = ns("select_pathway"), label = "Select Pathway", choices = NULL, multiple = FALSE),
-              actionButton(inputId = ns("get_images"), "Get Pathway Image",style="color: #fff; background-color: #0694bf; border-color: #013747"),)
+              actionButton(inputId = ns("get_images"), "Get Pathway Image",style="color: #fff; background-color: #0694bf; border-color: #013747"),
+              radioButtons(ns("extension_pathway"), "Save As:",
+              choices = c("png", "pdf", "svg", "eps"), inline = TRUE),
+              downloadButton(ns("download_pathway"), "Save Pathway Image",style="color: #fff; background-color: #0694bf; border-color: #013747"))
   
   
   
 }
 #' UI for KEGG gather
 #' @param id module id
-#' @importFrom shiny NS HTML actionButton selectInput tagList 
+#' @importFrom shiny NS HTML actionButton selectInput tagList downloadButton
 #' @importFrom shinyFeedback useShinyFeedback
 KEGG_gather_ui <- function(id){
   
@@ -58,9 +61,9 @@ KEGG_gather_ui <- function(id){
     HTML("<br><br><h5>Select Organisms of Interest</h5><br><br>"),
     selectInput(inputId = ns("organism_level"), label = "Select Taxonomic Level", choices = NULL, 
                 multiple = FALSE, selected = NULL),
-    selectInput(inputId = ns("organism"), label = "Select Organisms", choices = NULL, multiple = TRUE),
-    actionButton(inputId = ns("subset_genes"), "Subset",style="color: #fff; background-color: #0694bf; border-color: #013747")
-    
+    selectizeInput(inputId = ns("organism"), label = "Select Organisms", choices = NULL, multiple = TRUE),
+    actionButton(inputId = ns("subset_genes"), "Subset",style="color: #fff; background-color: #0694bf; border-color: #013747"),
+    downloadButton(ns("download_kg"), "Download xlsx",style="color: #fff; background-color: #0694bf; border-color: #013747")
   )
   
   
@@ -74,6 +77,8 @@ KEGG_gather_ui <- function(id){
 #' @importFrom spsComps shinyCatch
 #' @importFrom omu KEGG_gather assign_hierarchy 
 #' @importFrom DT renderDataTable datatable
+#' @importFrom ggplot2 ggsave
+#' @importFrom openxlsx write.xlsx
 KEGG_gather_server <- function(id){
   
   moduleServer(id, function(input, output, session){
@@ -165,8 +170,8 @@ KEGG_gather_server <- function(id){
       
       KG_Genes[,sapply(KG_Genes, is.factor)] <- sapply(KG_Genes[,sapply(KG_Genes,is.factor)], as.character)
       
-      KG_Genes <- KG_Genes[,sapply(KG_Genes, is.character)]
-      KG_Genes <- KG_Genes[,c(3,6,12,13,14,15,16,17,18,1,2,4,5,7,8,9,10,11)]
+      KG_Genes <- KG_Genes[,!sapply(KG_Genes, is.numeric)]
+      #KG_Genes <- KG_Genes[,c(3,6,12,13,14,15,16,17,18,1,2,4,5,7,8,9,10,11)]
       
       omu_list$kg_data$genes <- KG_Genes
       
@@ -189,9 +194,9 @@ KEGG_gather_server <- function(id){
       
       KG_Genes[,sapply(KG_Genes, is.factor)] <- sapply(KG_Genes[,sapply(KG_Genes,is.factor)], as.character)
       
-      KG_Genes <- KG_Genes[,sapply(KG_Genes, is.character)]
+      KG_Genes <- KG_Genes[,!sapply(KG_Genes, is.numeric)]
       
-      KG_Genes <- KG_Genes[,c(3,6,12,13,14,15,16,17,18,19,1,2,4,5,7,8,9,10,11)]
+      #KG_Genes <- KG_Genes[,c(3,6,12,13,14,15,16,17,18,19,1,2,4,5,7,8,9,10,11)]
       
       omu_list$kg_data$genes <- KG_Genes
       
@@ -204,7 +209,7 @@ KEGG_gather_server <- function(id){
       
       data <- reactiveValuesToList(omu_list)
       kg_genes <- data$kg_data$genes
-      kg_genes <- kg_genes[,c(6:9)]
+      kg_genes <- kg_genes[,names(kg_genes) %in% c("Kingdom", "Phylum", "Genus.Species", "Common.Name", "Phylum.Class.Family", "Genus", "Species.Strain.Serotype")]
       
       return(kg_genes)
       
@@ -229,7 +234,7 @@ KEGG_gather_server <- function(id){
     
     observeEvent(input$organism_level,{
       req(!is.null(data_genes()))
-      updateSelectInput(inputId = "organism", choices = unique(data_genes()[,input$organism_level]))
+      updateSelectizeInput(inputId = "organism", choices = unique(data_genes()[,input$organism_level]))
       
     })
     
@@ -340,6 +345,33 @@ KEGG_gather_server <- function(id){
       d <- kegg_tables()
       DT::datatable(data = d[["genes"]], options = list(scrollX = TRUE))
     })
+    
+    output$download_kg <- downloadHandler(
+      filename = "kg_data.xlsx",
+      
+      content = function(file) {
+        
+        l <- reactiveValuesToList(omu_list)
+        l <- c(l$kg_data)
+        write.xlsx(x = l, file = file, append = TRUE)
+        
+        
+      }
+    )
+    
+    output$download_pathway <- downloadHandler(
+      filename = function() {
+        paste("Pathway", input$extension_pathway, sep = ".")
+      },
+      
+      content = function (file) {
+    
+        ggsave(file, omu_list$kg_data$path_image, device = input$extension_pathway)
+          
+        }
+        
+      
+    )
     
     
     

@@ -25,16 +25,20 @@ histogram <- function(metabo, meta, metabolite, bins = 30, group="none"){
     plot <- ggplot(metabo_sub_melt,aes(x = Metabolite_Intensity)) + geom_histogram(color = "black",fill = "white", size = 2, bins = bins) + 
       facet_wrap(.~Metabolite, scales = "free") + 
       ylab("Number of Samples per Bin") +
-        theme(panel.grid = element_blank(), axis.text = element_text(size = 18), axis.title = element_text(size = 20), strip.text = element_text(size = 18),
-                         legend.title = element_blank(), legend.text = element_text(size = 18),         panel.background = element_rect(fill = "transparent",colour = NA),
+      xlab("Abundance") +
+      theme_bw() +
+        theme(panel.grid = element_blank(), axis.text = element_text(size = 16), axis.text.x = element_text(angle = 90), axis.title = element_text(size = 20), strip.text = element_text(size = 10),
+                         legend.title = element_blank(), legend.text = element_text(size = 14),         panel.background = element_rect(fill = "transparent",colour = NA),
               plot.background = element_rect(fill = "transparent",colour = NA))
   }else if(group!="none"){
 
     plot <- ggplot(metabo_sub_melt,aes(x = Metabolite_Intensity)) + geom_histogram(data = metabo_sub_melt,aes_string(color = group), fill = "white", size = 2, bins = bins)+ 
       facet_wrap(.~Metabolite, scales = "free") + 
       ylab("Number of Samples per Bin") +
-      theme(panel.grid = element_blank(), axis.text = element_text(size = 18), axis.title = element_text(size = 20), strip.text = element_text(size = 18),
-                         legend.title = element_blank(), legend.text = element_text(size = 18),        panel.background = element_rect(fill = "transparent",colour = NA),
+      xlab("Abundance") +
+      theme_bw() +
+      theme(panel.grid = element_blank(), axis.text = element_text(size = 16),axis.text.x = element_text(angle = 90), axis.title = element_text(size = 20), strip.text = element_text(size = 10),
+                         legend.title = element_blank(), legend.text = element_text(size = 14),        panel.background = element_rect(fill = "transparent",colour = NA),
             plot.background = element_rect(fill = "transparent",colour = NA))
   }
   return(plot)

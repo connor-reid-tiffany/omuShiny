@@ -14,11 +14,12 @@ upload_and_normalization_UI <- function(id) {
     actionButton(inputId = ns("make_list"), "Create Omu Object",style="color: #fff; background-color: #0694bf; border-color: #013747"),
     HTML("<br><br><h4>View Data Distributions</h4><br><br>"),
     selectizeInput(inputId = ns('histo_metabolite'), "Metabolite", choices = NULL, multiple = TRUE),
-    splitLayout(selectizeInput(inputId = ns('histo_group'), 'Group By', choices = NULL, multiple = FALSE),
-                numericInput(inputId = ns("bins"), label = "Bins", value = 15)),
+    selectizeInput(inputId = ns('histo_group'), 'Group By', choices = NULL, multiple = FALSE),
+    numericInput(inputId = ns("bins"), label = "Bins", value = 15),
     radioButtons(inputId = ns("histogram_extension"), "Save Histogram As:",
                  choices = c("png", "pdf", "svg", "pptx"), inline = TRUE),
     downloadButton(ns("download_histogram"), "Download Histogram",style="color: #fff; background-color: #0694bf; border-color: #013747"),
+    downloadButton(ns("download_kurtosis_skewness"), "Download Kurtosis and Skewness",style="color: #fff; background-color: #0694bf; border-color: #013747"),
     HTML("<br><br><h4>Normalize Data</h4><br><br>"),
     radioButtons(ns("transform_method"), "Pick Transformation Method:", c("Center by Mean" = "mean_center", "Pareto Scale" = "pareto_scale",
                                                                           "Natural Log" = "ln_t", "glog" = "glog", "Square Root" = "sqrt")),
@@ -41,6 +42,8 @@ upload_and_normalization_UI <- function(id) {
 #' @importFrom spsComps shinyCatch
 #' @importFrom omu assign_hierarchy
 #' @importFrom DT renderDataTable datatable
+#' @importFrom officer read_pptx ph_with add_slide ph_location_type
+#' @importFrom ggplot2 ggsave
 
 upload_and_normalization_server <- function(id) {
   
@@ -202,6 +205,38 @@ upload_and_normalization_server <- function(id) {
       histogram_plot()
     }, bg="transparent", execOnResize = TRUE)
     
+    output$dotplot_table <- DT::renderDataTable({
+      req(data())
+      
+      df <- data()
+      
+      DT::datatable(data = df, options = list(scrollX = TRUE), width = 1800)
+    })
+    
+    output$download_histogram <- downloadHandler(
+
+      filename = function() {
+        paste("histogram", input$histogram_extension, sep = ".")
+      },
+      
+      content = function (file) {
+        if (grepl(".pptx", file)==TRUE){
+          
+          doc <-  officer::read_pptx()
+          doc <- officer::add_slide(doc, layout =  'Title and Content', master = 'Office Theme')
+          doc <- officer::ph_with(doc, value = histogram_plot(), location = officer::ph_location_type(type = "body"))
+          print(doc, file)
+          
+        }else {
+          
+          
+          ggsave(file, histogram_plot(), device = input$histogram_extension, width = 15, height = 15, units = "cm")
+          
+        }
+        
+      }
+    )
+    
     density_p <- reactive({
       
       
@@ -221,6 +256,18 @@ upload_and_normalization_server <- function(id) {
       DT::datatable(data = d, options = list(scrollX = TRUE))
       
     })
+    
+    output$download_kurtosis_skewness <- downloadHandler(
+      filename = "kurtosis_skewness.xlsx",
+      
+      content = function(file) {
+        
+        d <- kurtosis_and_skewness(metabo = omu_list$data$metabo, meta = omu_list$data$meta, metabolite = input$histo_metabolite, group = input$histo_group)
+        write.xlsx(x = d, file = file)
+        
+        
+      }
+    )
     
     observeEvent(input$remove_samp, {
       
@@ -250,8 +297,6 @@ upload_and_normalization_server <- function(id) {
       omu_list$data$base_metabo <- base_metabo
     })
     
-    
-    output$download_histogram <- download_plot(input$histogram_extension, histogram_plot())
     
     #a reactive to update the data UI based on which data type  is selected as an input
     data_tables <- reactive({
