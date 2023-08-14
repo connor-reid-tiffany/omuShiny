@@ -108,9 +108,9 @@ random_forest_server <- function(id){
       rf <- rf_data()
       plot <- plot_variable_importance(rf_list = rf, color = input$rf_meta, n_metabolites = input$rf_n)+ 
         scale_x_discrete(label = function(x){ x <- gsub(pattern = "ID_", replacement = "", x = x); x <- stringr::str_trunc(x, 17); return(x)}) + labs(color = NULL, size = "Mean Decrease\nAccuracy") 
-      plot <- plot + theme(plot.tag.position = c(0,1),panel.grid = element_blank(), panel.border = element_rect(size = 1.5), 
-                           legend.position = "right", legend.box = "vertical",legend.justification = "left", 
-                           legend.box.just = "left",axis.text = element_text(size = input$rf_font), axis.title.x = element_text(size = input$rf_font), 
+      plot <- plot + theme_bw() + theme(plot.tag.position = c(0,1),panel.grid = element_blank(), panel.border = element_rect(size = 1.5), 
+                           legend.position  = "right", legend.box = "vertical",legend.justification = "left", 
+                           legend.box.just = "left",axis.text = element_text(size = input$rf_font), axis.title.x = element_text(size = input$rf_font), axis.title.y = element_blank(), 
                            legend.text = element_text(size = input$rf_font-5), legend.title = element_text(size = input$rf_font-5), 
                            legend.spacing.x = unit(-0.6, 'mm'), legend.margin = ggplot2::margin(0,3,0,0), legend.box.spacing = unit(0,"pt")
                            ,legend.box.background = element_blank(), legend.key = element_rect(color = NA,fill=NA))+
@@ -133,7 +133,7 @@ random_forest_server <- function(id){
       
       plot <- plot_rf_PCA(rf_list = rf, color = input$rf_model, size = input$rf_point_size, label = input$rf_labels, ellipse = input$rf_ellipses)
       
-      plot <- plot + theme(panel.grid = element_blank(), panel.border = element_rect(size = 1.5), legend.position = "top",
+      plot <- plot + theme_bw() + theme(panel.grid = element_blank(), panel.border = element_rect(size = 1.5), legend.position = "top",
                                         axis.text = element_text(size = input$rf_font-1), axis.title = element_text(size = input$rf_font), 
                                         legend.text = element_text(size = input$rf_font),legend.title = element_blank()) 
       return(plot)
