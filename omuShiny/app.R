@@ -27,6 +27,10 @@
 #library(gridExtra)
 #library(stringr)
 
+#' The shiny app
+#' @param ... placeholder
+#' @importFrom shiny fluidPage titlePanel tags radioButtons sidebarLayout sidebarPanel tabsetPanel tabPanel mainPanel observe session shinyApp verticalLayout conditionalPanel
+#' @importFrom bslib bs_theme bs_theme_update
 myApp <- function(...){
   my_theme <- bslib::bs_theme(bootswatch = "flatly")
 ui <- fluidPage(
