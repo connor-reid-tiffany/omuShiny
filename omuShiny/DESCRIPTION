@@ -1,7 +1,7 @@
 Package: omuShiny
 Title: Shiny application for untargeted metabolomics data analysis using KEGG metadata.
 Version: 0.1
-Authors@R:     person("Connor", "Tiffany", , "crtiffany@ucdavis.edu", role = c("aut", "cre"),
+Authors@R:     person("Connor", "Tiffany", , "tiffanyc1@chop.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8188-7720"))
 Description: Shiny app extension of the R package omu.
 License: GPL (>= 3)

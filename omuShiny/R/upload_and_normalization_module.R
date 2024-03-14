@@ -111,16 +111,9 @@ upload_and_normalization_server <- function(id) {
       metabo[,names(metabo) %in% columns] <- apply(metabo[,names(metabo) %in% columns], MARGIN = 2, 
                                                    function(x) gsub(pattern = ",", replacement = "_", x = x))
       
-      metabo$Metabolite <- gsub(pattern = "-", replacement = "_", x = metabo$Metabolite)
-      
-      metabo$Metabolite <- gsub(pattern = "\\(", replacement = "", x = metabo$Metabolite)
-      
-      metabo$Metabolite <- gsub(pattern = "\\)", replacement = "", x = metabo$Metabolite)
-      
-      metabo$Metabolite <- gsub(pattern = ",", replacement = "_", x = metabo$Metabolite)
-      
-      metabo$Metabolite <- gsub(pattern = " ", replacement = "_", x = metabo$Metabolite)
-      
+      metabo$Metabolite <- gsub(pattern = "[\\-|\\;|\\:]", replacement = "_", x = metabo$Metabolite, perl = TRUE)
+      metabo$Metabolite <- gsub(pattern = "[\\[|\\]|\\(|\\)|\\/|\\|\\*|\\+]", replacement = "", x = metabo$Metabolite, perl = TRUE)
+      metabo$Metabolite <- gsub(pattern = ",", replacement = "..", x = metabo$Metabolite, perl = TRUE)
       
       #create base_metabo df for volcano plot log2FoldChange
       base_metabo <- metabo
