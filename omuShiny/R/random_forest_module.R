@@ -73,6 +73,7 @@ random_forest_server <- function(id){
     
     observeEvent(input$rf,{
       
+      req(model())
       df <- data()
       
       meta <- df$meta
@@ -91,6 +92,11 @@ random_forest_server <- function(id){
         
       }
       
+      if(length(model())==2){
+        
+        shinyCatch(stop("Model term is missing. Type in model term"), blocking_level = "error")
+        
+      }
       omu_list$rf_list <- omu::random_forest(count_data = metabo, metadata = meta, model = model(), training_proportion = proportion(), n_tree = 500)
       updateSelectInput(inputId = "rf_group", choices = colnames(meta[,names(meta)!="Sample", drop = FALSE]))
       

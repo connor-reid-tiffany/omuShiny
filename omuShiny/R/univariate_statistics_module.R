@@ -35,7 +35,9 @@ anova_server <- function(id){
   moduleServer(id, function(input, output, session){
     
     anova_model <- reactive({
+      req(input$anova_model)
       model <- as.formula(paste("~", input$anova_model))
+    
       
     })
     
@@ -46,14 +48,23 @@ anova_server <- function(id){
     })
     
     observeEvent(input$run_anova, {
+      if(input$anova_model==""){
+        
+        shinyCatch(stop("Model term is missing. Type in model term"), blocking_level = "error")
+        
+      } else{
+       model <- anova_model()
+        
+      }
       req(is.null(omu_list$data)==FALSE)
       #showModal(modalDialog("Running Anova", footer=NULL))
       data <- omu_list$data
       count_data <- data$metabo
       metadata <- data$meta
-      model <- anova_model()
+      #model <- anova_model()
       Factor <- test_Factor()
 
+ 
       
       model_characters <- strsplit(gsub("[^[:alnum:] ]", "", as.character(model)[-1]), " +")[[1]]
       
@@ -82,7 +93,7 @@ anova_server <- function(id){
       }
       
 
-      
+     
       omu_list$stats <- switch(input$stats_test, anova = omu_anova(count_data = count_data, metadata = metadata, 
                                                                    model = model, log_transform = FALSE, method = "anova"),
                                dunn = omu_anova(count_data = count_data, metadata = metadata, 
