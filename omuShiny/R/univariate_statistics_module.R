@@ -34,6 +34,29 @@ anova_server <- function(id){
   
   moduleServer(id, function(input, output, session){
     
+    
+    imputation_check <- function(count_data,metadata,model_characters){
+      
+      rownames(metabo) <- metabo$Metabolite
+      metabo <- metabo[,!names(metabo)%in%c("KEGG")]
+      metabo_list <- split(metabo, f = as.factor(metabo$Metabolite))
+      metabo_list <- lapply(metabo_list, function(x){x <- x[,!names(x)=="Metabolite"]; return(x)})
+      metabo_list <- lapply(metabo_list, function(x) as.data.frame(t(x)))
+      metabo_list <- lapply(metabo_list, function(x){x$Sample <- rownames(x); return(x)})
+      metabo_list <- lapply(metabo_list, function(x){
+        x$term <- metadata[,model_characters][match(x$Sample,metadata$Sample)]; return(x)})
+      metabo_list <- lapply(metabo_list, function(x){x <- x[-2]; return(x)})
+      metabo_list <- lapply(metabo_list, function(x){colnames(x)[1] <- "metabolite"; return(x)})
+      metabo_list <- lapply(metabo_list, function(x) dcast(x, metabolite~term, fun.aggregate = length))
+      metabo_list <- lapply(metabo_list, function(x){x <- x[-1]; x <- as.data.frame(t(x));
+      return(x)})
+      metabo_list <- lapply(metabo_list, function(x) sapply(x, function(x)x >= 3))
+      metabo_check <- lapply(metabo_list, function(x) apply(x, MARGIN = 2, all))
+      metabo_check <- lapply(metabo_check, function(x) any(x)==TRUE)
+      return(metabo_check)
+    }
+    
+    
     anova_model <- reactive({
       req(input$anova_model)
       model <- as.formula(paste("~", input$anova_model))
@@ -90,6 +113,13 @@ anova_server <- function(id){
         
         shinyCatch(stop("Method kruskal needs at least 3 levels in the model term."), blocking_level = "error")
         
+      }
+      
+      test_impute <- imputation_check(count_data = count_data, metadata = metadata, model_characters = model_characters)
+      
+      if(input$stats_test%in%c("welch","students", "students_p", "welch_t", "welch_t_p", "anova") & any(test_impute==TRUE)){
+        
+        shinyCatch(stop("Repeated values in 3 or more samples for 1 or more metabolites, data might have imputed values. Use wilcox or kruskal test."), blocking_level = "error")
       }
       
 
