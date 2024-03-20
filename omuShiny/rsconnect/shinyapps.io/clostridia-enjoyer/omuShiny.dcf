@@ -5,7 +5,7 @@ account: clostridia-enjoyer
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9605466
-bundleId: 7567141
+bundleId: 8395954
 url: https://clostridia-enjoyer.shinyapps.io/omuShiny/
 version: 1
 asMultiple: FALSE

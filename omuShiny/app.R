@@ -26,7 +26,7 @@ library(ggpubr)
 library(ggrepel)
 library(gridExtra)
 library(stringr)
-
+library(reshape2)
 #' The shiny app
 #' @param ... placeholder
 #' @importFrom shiny fluidPage titlePanel tags radioButtons sidebarLayout sidebarPanel tabsetPanel tabPanel mainPanel observe session shinyApp verticalLayout conditionalPanel
